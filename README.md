@@ -92,13 +92,30 @@ Part 1: Agent Tools
     * Gemini Tools: google_search, BuiltInCodeExecutor
     * Google Cloud Tools
     * Third-party Tools: Hugging Face, Github
-  
 
 
 
+### Day 2b: Agent Tools Best Practices
+
+If we want to connect our agents to external systems, we need to write an maintain API clients
+MCP is an open standard that lets agents use community built integrations. 
+
+MCP enables agents: 
+* Access live, external data
+* Leverage community-built tools
+* scale capabilities.
 
 
+Use MCP with Agents:
 
+Workflow:
+1. Choose and MCP Server and tool
+2. Create the MCP Toolset
+3. Add it to your agent
+4. Test the agent
+
+
+##### Long Running Operations
 
 
 
