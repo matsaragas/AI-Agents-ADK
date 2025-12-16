@@ -6,6 +6,101 @@ End-to-end Agentic AI Framework using Gemini ADK: models, tools, orchestration, 
 This is course provided by [Kaggle](https://www.kaggle.com/whitepaper-introduction-to-agents). The Key concepts of the Agentic
 AI framework that we will be using is described in the [white paper](https://www.kaggle.com/whitepaper-introduction-to-agents).
 
+The course covers the following:
+
+### Day 1: Introduction 
+
+Part 1: ADK Definition
+- Define an agent using Google ADK, 
+- specify the model available for the agent 
+- connect the agent to the tools
+
+Part 2: Multi-agent systems & workflows
+- Multi-agent team: Define agents with specific output, Root coordinator to bring agents together as tools and instructions 
+  on how to coordinate the agents,
+  
+- Sequential Workflows - Assembly Line: use `SequentialAgent` to connect and run sub-agents in a pre-specified order.
+- Parallel Workflows - Independent RResearchers: Use `ParallelAgent` to execute sub-agents 
+  concurrently and speed up the workflow. Aggregate the results using an aggregator agent. 
+  
+```python
+
+aggregator_agent = Agent(
+  name="AggregatorAgent",
+  model=Gemini(
+    model="gemini-2.5-flash-lite",
+    retry_options=retry_config
+  ),
+  # It uses placeholders to inject the outputs from the parallel agents, which are now in the session state.
+  instruction="""Combine these three research findings into a single executive summary:
+
+    **Technology Trends:**
+    {tech_research}
+    
+    **Health Breakthroughs:**
+    {health_research}
+    
+    **Finance Innovations:**
+    {finance_research}
+    
+    Your summary should highlight common themes, surprising connections, and the most important key takeaways from all three reports. The final summary should be around 200 words.""",
+  output_key="executive_summary",  # This will be the final output of the entire system.
+)
+
+print("✅ aggregator_agent created.")
+
+parallel_research_team = ParallelAgent(
+    name="ParallelResearchTeam",
+    sub_agents=[tech_researcher, health_researcher, finance_researcher],
+)
+
+# This SequentialAgent defines the high-level workflow: run the parallel team first, then run the aggregator.
+root_agent = SequentialAgent(
+    name="ResearchSystem",
+    sub_agents=[parallel_research_team, aggregator_agent],
+)
+
+print("✅ Parallel and Sequential Agents created.")
+
+
+runner = InMemoryRunner(agent=root_agent)
+response = await runner.run_debug(
+  "Run the daily executive briefing on Tech, Health, and Finance"
+)
+```
+
+
+- Loops workflows: Use `LoopAgent` to run a set of sub-agents repeatedly until a condition is met 
+  or a number of iterations is reached.
+
+### Day 2: Agent Tools
+
+Part 1: Agent Tools
+
+- Define customized tools and make it available to Agents.
+- Improve agents Reliability with Code. Use An `LlmAgent` that uses `BuiltInCodeExecutor` 
+- Custom vs Built-in Tools:
+  * Custom:
+    * Advantage: Complete Control
+    * Function Tools: Python functions -> Turn any python function into an agent 
+    * Long Running Tools: Functions for operations that take significant time (Human in the loop approvals).
+    * Agent Tools: other agents used as tools
+    * MCP tools: Filesystem access, Google Maps
+    * OpenAI tools: REST API endpoints become callale tools
+  
+  * Buit-in Tools:
+    * Gemini Tools: google_search, BuiltInCodeExecutor
+    * Google Cloud Tools
+    * Third-party Tools: Hugging Face, Github
+  
+
+
+
+
+
+
+
+
 
 The Key Ideas are described below:
 
